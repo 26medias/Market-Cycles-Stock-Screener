@@ -14,7 +14,7 @@ class Screener:
         self.hta = HelperTA()
     
     def screen(self):
-        self.downloader.download(period='1y')
+        self.downloader.download(period='30d')
         data = self.downloader.data['Close']
 
         self.marketCycles = self.hta.MarketCycle(data, data, data, 
@@ -25,6 +25,8 @@ class Screener:
                                             )
         self.sellList = self.marketCycles.loc[:, self.marketCycles.iloc[-1] >= 80].iloc[-1].sort_values(ascending=False)
         self.buyList = self.marketCycles.loc[:, self.marketCycles.iloc[-1] <= 20].iloc[-1].sort_values(ascending=True)
+        self.sellSignals = self.marketCycles.loc[:, (self.marketCycles.iloc[-1] < 80) & (self.marketCycles.iloc[-2] >= 80)].iloc[-1].sort_values(ascending=False)
+        self.buySignals = self.marketCycles.loc[:, (self.marketCycles.iloc[-1] > 20) & (self.marketCycles.iloc[-2] <= 20)].iloc[-1].sort_values(ascending=True)
 
     
     def summary(self, watchlist):

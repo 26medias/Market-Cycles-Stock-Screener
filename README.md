@@ -1,6 +1,6 @@
 # Market Cycles Stock Screener
 
-Stock Screener, scans the NYSE & NASDAQ and displays a QT5 UI with Buys & Sells watchlists
+Stock Screener, scans the NYSE & NASDAQ and displays a QT5 UI with Buys & Sells watchlists, as well as daily buy & sell signals.
 
 The Market Cycle indicator is a weighted average of the RSI, Stochastic RSI & Stochastic Oscillator.
 
@@ -9,6 +9,9 @@ I found it to be useful in finding the peaks and bottoms without much lag.
 It returns a value in the range [0; 100]. Read it like the RSI indicator: < 20 is oversold, > 80 is overbought.
 
 Tradingview indicator: https://www.tradingview.com/script/KutjMaH0-Market-Cycle-Indicator/
+
+
+*Not an investment advice. Always do your own research, do not trade blindly off signals.*
 
 ## Install
 
@@ -30,4 +33,5 @@ Tradingview indicator: https://www.tradingview.com/script/KutjMaH0-Market-Cycle-
 ### Market Cycle Indicator
 
 ![Screenshot](screenshot-tradingview.png)
+
 

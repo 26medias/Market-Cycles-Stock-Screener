@@ -29,14 +29,20 @@ class StockScreenerUI(QWidget):
         screener.screen()
         sells = screener.summary(screener.sellList)
         buys = screener.summary(screener.buyList)
+        sellSignals = screener.summary(screener.sellSignals)
+        buySignals = screener.summary(screener.buySignals)
 
         self.tab_widget.clear()
 
         buys_table = self.create_table(buys)
         sells_table = self.create_table(sells)
+        buySignals_table = self.create_table(buySignals)
+        sellSignals_table = self.create_table(sellSignals)
 
-        self.tab_widget.addTab(buys_table, "Buys")
-        self.tab_widget.addTab(sells_table, "Sells")
+        self.tab_widget.addTab(buys_table, "Oversold Watchlist")
+        self.tab_widget.addTab(sells_table, "Overbought Watchlist")
+        self.tab_widget.addTab(buySignals_table, "Buy Signals")
+        self.tab_widget.addTab(sellSignals_table, "Sell Signals")
 
     def create_table(self, df):
         table = QTableView()

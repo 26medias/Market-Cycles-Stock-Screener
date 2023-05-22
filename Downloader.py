@@ -44,7 +44,7 @@ class Downloader:
         #filename  = 'temp.pkl'#'data_'+period+'_'+(hashlib.sha224((''.join(self.symbols)).encode('utf-8')).hexdigest())+".pkl"
         filename  = 'data_'+now_str+'_'+(hashlib.sha224((''.join(self.symbols)).encode('utf-8')).hexdigest())+".pkl"
       else:
-        filename  = 'data_'+period+'_'+(hashlib.sha224(('all').encode('utf-8')).hexdigest())+".pkl"
+        filename  = 'data_'+now_str+'_'+(hashlib.sha224(('all').encode('utf-8')).hexdigest())+".pkl"
     
     if path.exists(filename):
       print("Using cached data")
