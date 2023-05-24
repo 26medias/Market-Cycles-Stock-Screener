@@ -10,6 +10,8 @@ It returns a value in the range [0; 100]. Read it like the RSI indicator: < 20 i
 
 Tradingview indicator: https://www.tradingview.com/script/KutjMaH0-Market-Cycle-Indicator/
 
+Export format: NYSE:AMC,NYSE:GME,NASDAQ:DKNG
+
 
 *Not an investment advice. Always do your own research, do not trade blindly off signals.*
 

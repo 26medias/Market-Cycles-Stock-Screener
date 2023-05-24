@@ -31,7 +31,8 @@ class Downloader:
   
   def download(self, sector=None, symbols=None, period='1y'):
     print("Download: ", sector, symbols)
-    now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    now_str = datetime.datetime.now().strftime("%Y-%m-%d %H")
+    #now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     if sector is not None:
       self.sector = sector
       rows      = self.stocklist[self.stocklist['Sector']==sector]
