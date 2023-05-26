@@ -1,0 +1,11 @@
+{
+    "timeframe": "Daily",
+    "overbought": 75,
+    "oversold": 25,
+    "donchian_period": 14,
+    "rsi_period": 14,
+    "srsi_period": 20,
+    "donchian_weight": 1.0,
+    "rsi_weight": 2.0,
+    "srsi_weight": 5.0
+}

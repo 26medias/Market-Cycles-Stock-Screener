@@ -8,6 +8,7 @@ __pycache__/
 
 # Temp files
 data_*.pkl
+*.pkl
 
 # Distribution / packaging
 .Python

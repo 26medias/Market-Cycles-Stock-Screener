@@ -36,7 +36,7 @@ class StockScreenerUI(QWidget):
         self.buys_df = pd.DataFrame()
         self.sells_df = pd.DataFrame()
 
-    def export_data_old(self):
+    def export_selected_data(self):
         current_tab_label = self.tab_widget.tabText(self.tab_widget.currentIndex())
         date_string = datetime.now().strftime("%Y-%m-%d")
         default_file_name = f"{current_tab_label} - {date_string}.txt"

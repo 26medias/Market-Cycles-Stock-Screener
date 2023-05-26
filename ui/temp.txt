@@ -1,0 +1,98 @@
+mainwindow.py
+```
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QPushButton, QVBoxLayout, QWidget, QHBoxLayout, QLabel, QStatusBar, QProgressBar
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QFont, QIcon
+
+import time
+import json
+from tabmanager import TabManager
+from custom_widgets import CustomComboBox, CustomSpinBox, CustomDoubleSpinBox
+from screener.Screener import Screener
+from Worker import Worker
+from DataFrameModel import DataFrameModel
+
+class MainWindow(QMainWindow):
+    def __init__(self, QApplication):
+        super().__init__()
+        self.QApplication = QApplication
+        self.setWindowTitle('Stock Screener')
+        self.resize(800, 600)
+        self.screener = Screener()
+
+        self.tabs = {
+            'Buys': self.screener.get_buySignals,
+            'Sells': self.screener.get_sellSignals
+        }
+
+        # Initialize options dict with default values
+        self.options = {"timeframe": "Daily", "overbought": 80, "oversold": 20, 
+                        "donchian_period": 14, "rsi_period": 14, "srsi_period": 20, 
+                        "donchian_weight": 0.5, "rsi_weight": 1, "srsi_weight": 1}
+
+        self.status_label = QLabel('Done')  # Initialize the QLabel
+        self.status_label.setAlignment(Qt.AlignCenter)  # Center the QLabel
+        self.status_label.setFont(QFont("Arial", 10))  # Make the QLabel small
+        self.status_label.font().setItalic(True)  # Set the font to italic
+        self.setup_ui()
+
+    # Setup the UI
+    def setup_ui(self):
+        widget = QWidget()
+        layout = QVBoxLayout()
+
+        self.options_layout = self.setup_ui_options()
+        self.buttons_layout = self.setup_ui_buttons()
+        self.tab_manager = TabManager(self.tabs, self)
+
+        layout.addLayout(self.options_layout)
+        layout.addLayout(self.buttons_layout)
+        layout.addWidget(self.tab_manager)
+
+        self.statusBar().addWidget(self.status_label, 1)
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
+```
+
+tabmanager.py
+```
+from PyQt5.QtWidgets import QTabWidget, QTableView
+from DataFrameModel import DataFrameModel
+
+class TabManager(QTabWidget):
+    def __init__(self, tabs_dict: dict, main_window):
+        super(TabManager, self).__init__()
+        self.tabs_dict = tabs_dict
+        self.main_window = main_window
+        self.create_tabs()
+        self.currentChanged.connect(self.refresh_current_tab)
+
+    def create_tabs(self):
+        for tab_name, func in self.tabs_dict.items():
+            self.addTab(self.create_tab_content(func), tab_name)
+
+    def create_tab_content(self, func):
+        view = QTableView()
+        data_frame = func()
+        model = DataFrameModel(data_frame)
+        view.setModel(model)
+        view.setSortingEnabled(True)
+        return view
+
+    def refresh_content(self, func):
+        index = self.currentIndex()
+        self.widget(index).setModel(DataFrameModel(func()))
+
+    def refresh_current_tab(self):
+        self.main_window.refresh_current_tab()
+```
+
+Here is my abbreviated code.
+
+`layout.addWidget(self.tab_manager)` This is pretty much the main content of the app.
+I'd like to a method `set_loading_status(self, status)` which when true shows a loading screen instead of the tabs, when false, shows the tabs.
+That loading component should be a progress bar, with text under. It should be centered on the available space.
+I should control it using `def set_loading_settings(self, current, total, label)` where for example if `current=2` and `total=10` it sets the progress bar at 20% and shows "2/10" next to it on over it or something
+If it reaches 100%, call `set_loading_status(False)`
+
+Show me the updates
