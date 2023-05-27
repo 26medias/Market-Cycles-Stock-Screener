@@ -40,16 +40,20 @@ class Screener:
         curr = int(settings["curr"])
         prev = curr-1
 
-        self.processed = pd.DataFrame(index=self.marketCycles.iloc[curr].index, columns=["Symbol", "DCO", "MarketCycle", "MarketCycle_prev", "close", "1D-change", "5D-change", "20D-change", "Exchange"])
+        #print("data")
+        #print(data.count())
+
+        self.processed = pd.DataFrame(index=self.marketCycles.iloc[curr].index, columns=["Symbol", "DCO", "MarketCycle", "MarketCycle_prev", "1D-change", "5D-change", "20D-change", "close", "Exchange", "Datapoints"])
         self.processed["Symbol"] = self.marketCycles.iloc[curr].index
         self.processed["MarketCycle"] = self.marketCycles.iloc[curr]
         self.processed["MarketCycle_prev"] = self.marketCycles.iloc[prev]
         self.processed["DCO"] = self.DCO.iloc[curr]
         self.processed["close"] = data.iloc[curr]
         self.processed["1D-change"] = (data.iloc[curr]-data.iloc[prev])/data.iloc[prev]*100
-        self.processed["5D-change"] = (data.iloc[curr]-data.iloc[-6])/data.iloc[-6]*100
-        self.processed["20D-change"] = (data.iloc[curr]-data.iloc[-20])/data.iloc[-20]*100
+        self.processed["5D-change"] = (data.iloc[curr]-data.iloc[prev-5])/data.iloc[prev-5]*100
+        self.processed["20D-change"] = (data.iloc[curr]-data.iloc[prev-20])/data.iloc[prev-20]*100
         self.processed["Exchange"] = self.downloader.stocklist[self.downloader.stocklist['Symbol'].isin(self.marketCycles.iloc[curr].index)].set_index('Symbol')["Exchange"]
+        self.processed["Datapoints"] = data.count()
         self.processed = self.processed.dropna()
 
         self.date = self.marketCycles.iloc[curr].name.strftime('%Y-%m-%d %H:%M:%S')
@@ -83,14 +87,23 @@ class Screener:
 
         self.DCO, DCOs = self.hta.DCO(data, donchianPeriod=20, smaPeriod=3)
 
-        self.processed = pd.DataFrame(index=self.marketCycles.iloc[curr].index, columns=["Symbol", "DCO", "MarketCycle", "MarketCycle_prev", "close", "1M-change", "Exchange"])
+        # Get the daily data
+        oData = self.downloader.data['Close'].copy().T
+        dailyData = oData[oData.index.isin(self.marketCycles.iloc[curr].index)].T
+
+        # Monthly df
+        self.processed = pd.DataFrame(index=self.marketCycles.iloc[curr].index, columns=["Symbol", "DCO", "MarketCycle", "MarketCycle_prev", "1M-change", "1D-change", "5D-change", "20D-change", "close", "Exchange", "Datapoints"])
         self.processed["Symbol"] = self.marketCycles.iloc[curr].index
         self.processed["MarketCycle"] = self.marketCycles.iloc[curr]
         self.processed["MarketCycle_prev"] = self.marketCycles.iloc[prev]
         self.processed["DCO"] = self.DCO.iloc[curr]
         self.processed["close"] = data.iloc[curr]
         self.processed["1M-change"] = (data.iloc[curr]-data.iloc[prev])/data.iloc[prev]*100
+        self.processed["1D-change"] = (dailyData.iloc[curr]-dailyData.iloc[prev])/dailyData.iloc[prev]*100
+        self.processed["5D-change"] = (dailyData.iloc[curr]-dailyData.iloc[prev-5])/dailyData.iloc[prev-5]*100
+        self.processed["20D-change"] = (dailyData.iloc[curr]-dailyData.iloc[prev-20])/dailyData.iloc[prev-20]*100
         self.processed["Exchange"] = self.downloader.stocklist[self.downloader.stocklist['Symbol'].isin(self.marketCycles.iloc[curr].index)].set_index('Symbol')["Exchange"]
+        self.processed["Datapoints"] = dailyData.count()
         self.processed = self.processed.dropna()
 
         self.date = self.marketCycles.iloc[curr].name.strftime('%Y-%m-%d %H:%M:%S')
@@ -100,12 +113,12 @@ class Screener:
     # Filter the data
     def filter(self, settings=None):
         df = self.processed.copy()
-        self.buySignals = df[(df['MarketCycle'] > settings['oversold']) & (df['MarketCycle_prev'] <= settings['oversold'])]
-        self.sellSignals = df[(df['MarketCycle'] < settings['overbought']) & (df['MarketCycle_prev'] >= settings['overbought'])]
-        self.buySignalsInTrend = df[(df['MarketCycle'] > settings['oversold']) & (df['MarketCycle_prev'] <= settings['oversold']) & (df['DCO'] > 50)]
-        self.sellSignalsInTrend = df[(df['MarketCycle'] < settings['overbought']) & (df['MarketCycle_prev'] >= settings['overbought']) & (df['DCO'] < 50)]
-        self.buySignalsCounterTrend = df[(df['MarketCycle'] > settings['oversold']) & (df['MarketCycle_prev'] <= settings['oversold']) & (df['DCO'] < 50)]
-        self.sellSignalsCounterTrend = df[(df['MarketCycle'] < settings['overbought']) & (df['MarketCycle_prev'] >= settings['overbought']) & (df['DCO'] > 50)]
+        self.buySignals = df[(df['MarketCycle'] > settings['oversold']) & (df['MarketCycle_prev'] <= settings['oversold']) & (df['Datapoints'] >= settings['minDatapoints'])]
+        self.sellSignals = df[(df['MarketCycle'] < settings['overbought']) & (df['MarketCycle_prev'] >= settings['overbought']) & (df['Datapoints'] >= settings['minDatapoints'])]
+        self.buySignalsInTrend = df[(df['MarketCycle'] > settings['oversold']) & (df['MarketCycle_prev'] <= settings['oversold']) & (df['DCO'] > 50) & (df['Datapoints'] >= settings['minDatapoints'])]
+        self.sellSignalsInTrend = df[(df['MarketCycle'] < settings['overbought']) & (df['MarketCycle_prev'] >= settings['overbought']) & (df['DCO'] < 50) & (df['Datapoints'] >= settings['minDatapoints'])]
+        self.buySignalsCounterTrend = df[(df['MarketCycle'] > settings['oversold']) & (df['MarketCycle_prev'] <= settings['oversold']) & (df['DCO'] < 50) & (df['Datapoints'] >= settings['minDatapoints'])]
+        self.sellSignalsCounterTrend = df[(df['MarketCycle'] < settings['overbought']) & (df['MarketCycle_prev'] >= settings['overbought']) & (df['DCO'] > 50) & (df['Datapoints'] >= settings['minDatapoints'])]
         self.filtered = True
 
     # Main call

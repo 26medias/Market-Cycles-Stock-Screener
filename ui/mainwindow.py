@@ -354,7 +354,7 @@ class MainWindow(QMainWindow):
         
     # Returns the option values as a dict
     def get_options(self):
-        return {"timeframe": self.timeframe.currentText(), "curr": self.curr.value(), "overbought": self.overbought.value(), 
+        return {"timeframe": self.timeframe.currentText(), "curr": self.curr.value(), "minDatapoints": self.minDatapoints.value(), "overbought": self.overbought.value(), 
                 "oversold": self.oversold.value(), "donchian_period": self.donchian_period.value(), 
                 "rsi_period": self.rsi_period.value(), "srsi_period": self.srsi_period.value(), 
                 "donchian_weight": self.donchian_weight.value(), "rsi_weight": self.rsi_weight.value(), 
@@ -364,6 +364,7 @@ class MainWindow(QMainWindow):
     def set_options(self, values):
         self.timeframe.setCurrentText(values.get("timeframe", self.options.get("timeframe")))
         self.curr.setValue(values.get("curr", self.options.get("curr")))
+        self.minDatapoints.setValue(values.get("minDatapoints", self.options.get("minDatapoints")))
         self.overbought.setValue(values.get("overbought", self.options.get("overbought")))
         self.oversold.setValue(values.get("oversold", self.options.get("oversold")))
         self.donchian_period.setValue(values.get("donchian_period", self.options.get("donchian_period")))
@@ -388,6 +389,13 @@ class MainWindow(QMainWindow):
         self.curr.setRange(-10000, -1)
         self.curr.setValue(-1)
         curr_layout.addWidget(self.curr)
+
+        minDatapoints_layout = QVBoxLayout()
+        minDatapoints_layout.addWidget(QLabel("Min Datapoints"))
+        self.minDatapoints = CustomSpinBox()
+        self.minDatapoints.setRange(0, 10000)
+        self.minDatapoints.setValue(500)
+        minDatapoints_layout.addWidget(self.minDatapoints)
 
         overbought_layout = QVBoxLayout()
         overbought_layout.addWidget(QLabel("Overbought"))
@@ -439,6 +447,7 @@ class MainWindow(QMainWindow):
 
         options_layout.addLayout(timeframe_layout)
         options_layout.addLayout(curr_layout)
+        options_layout.addLayout(minDatapoints_layout)
         options_layout.addLayout(overbought_layout)
         options_layout.addLayout(oversold_layout)
         options_layout.addLayout(donchian_period_layout)

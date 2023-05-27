@@ -46,6 +46,7 @@ class DataFrameModel(QStandardItemModel):
             'DCO': {'min': 0, 'max': 100},
             'MarketCycle': {'min': 0, 'max': 100},
             'MarketCycle_prev': {'min': 0, 'max': 100},
+            '1M-change': {'min': -50, 'max': 50},
             '1D-change': {'min': -50, 'max': 50},
             '5D-change': {'min': -50, 'max': 50},
             '20D-change': {'min': -50, 'max': 50},
